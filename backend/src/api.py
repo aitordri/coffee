@@ -19,7 +19,15 @@ CORS(app)
 # db_drop_and_create_all()
 
 ## ROUTES
+
+
+
+@app.route('/')
+def index():
+    return jsonify({'message':'hello-world'})
+    
 '''
+
 @TODO implement endpoint
     GET /drinks
         it should be a public endpoint
