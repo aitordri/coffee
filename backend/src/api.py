@@ -16,7 +16,9 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+##db_drop_and_create_all()
+
+## Damm haha
 
 ## ROUTES
 
@@ -63,7 +65,7 @@ def get_drinks_detail(jwt):
     drinks = Drink.query.all()
     drinks_list = []
     for drink in drinks:
-        drinksArr.append(drink.long())
+        drinks_list.append(drink.long())
     return jsonify({
                     'success': True,
                     'drinks': drinks_list
@@ -149,9 +151,38 @@ def unprocessable(error):
 @TODO implement error handler for 404
     error handler should conform to general task above 
 '''
+@app.errorhandler(404)
+def unprocessable(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 404,
+                    "message": "resource not found"
+                    }), 404
 
 
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+
+
+
+@app.errorhandler(AuthError)
+def processAuthError(error):
+    message = [str(x) for x in error.args]
+    status_code = error.status_code
+
+    return jsonify({
+                    "success": False, 
+                    "error": status_code,
+                    "message": message
+                    }), status_code
+
+
+def getJSONListFromObject(obj):
+    if not isinstance(obj, list):
+        obj = [obj]
+    
+    jsonList = json.dumps(obj)
+
+    return jsonList
