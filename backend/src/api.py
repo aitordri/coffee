@@ -110,7 +110,26 @@ def post_drinks(jwt):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def patch_drinks(jwt, id):
+    drink = Drink.query.get(id)
+    if drink is None:
+        abort(404)
+    
+    data = request.get_json()
+    if "title" in data:
+        drink.title = data['title']
 
+    if "recipe" in data:
+        recipe = data['recipe']
+        recipeJSON = getJSONListFromObject(recipe)
+    
+        drink.recipe = recipeJSON
+    
+    drink.update()
+    return jsonify({'success': True,
+                    'drinks':drink.long()})
 
 '''
 @TODO implement endpoint
@@ -122,6 +141,24 @@ def post_drinks(jwt):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+
+@app.route('/drinks/<id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drinks(jwt, id):
+    drink = Drink.query.get(id)
+    if drink is None:
+        abort(404)
+    
+    id = drink.id
+    
+    drink.delete()
+    return jsonify({'success': True,
+                    'delete': id})
+
+
+@app.route('/login-results', methods=['GET'])
+def login_results():
+    return (jsonify({'message': 'successful login'}))
 
 
 ## Error Handling
